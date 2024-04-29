@@ -16,6 +16,7 @@ export const Product = (
         handleOpen,
         removeVariant,
         handleShowVariant,
+        addedProductsArr
     }
 ) => {
     const { attributes, listeners, setNodeRef, transform, transition } =
@@ -61,10 +62,12 @@ export const Product = (
                             <option value="">% Off <IoChevronDownOutline /></option>
                             <option value="">flat <IoChevronDownOutline /></option>
                         </select>
-                        <RiCloseLine
-                            onClick={() => removeProduct(index)}
-                            style={{ cursor: 'pointer' }}
-                        />
+                        {addedProductsArr?.length > 1 &&
+                            <RiCloseLine
+                                onClick={() => removeProduct(index)}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        }
                     </div>
                 }
             </div>
@@ -99,10 +102,12 @@ export const Product = (
                                     <option value="">% Off <IoChevronDownOutline /></option>
                                     <option value="">flat <IoChevronDownOutline /></option>
                                 </select>
-                                <RiCloseLine
-                                    onClick={() => removeVariant(newProduct.id, variant.id)}
-                                    style={{ cursor: 'pointer' }}
-                                />
+                                {newProduct?.variants?.length > 1 &&
+                                    <RiCloseLine
+                                        onClick={() => removeVariant(newProduct.id, variant.id)}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                }
                             </div>
                         </div>
                     )

@@ -43,7 +43,8 @@ const ProductList = ({
                         handleNotShowDiscount={handleNotShowDiscount}
                         handleOpen={handleOpen}
                         removeVariant={removeVariant}
-                        handleShowVariant={handleShowVariant} />
+                        handleShowVariant={handleShowVariant}
+                        addedProductsArr={addedProductsArr} />
                 ))}
             </SortableContext>
         </DndContext>
