@@ -27,11 +27,12 @@ export const Product = (
     };
 
     return (
-        <div className="product-container">
+        <div className="product-container"
+            ref={setNodeRef}
+            style={style}
+            key={key}
+        >
             <div className="product-wrapper"
-                ref={setNodeRef}
-                style={style}
-                key={key}
             >
                 <LuGripVertical {...attributes}
                     {...listeners} className="grip-icon" />
