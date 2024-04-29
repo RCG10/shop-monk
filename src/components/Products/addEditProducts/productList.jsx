@@ -1,9 +1,5 @@
-import { useSortable, SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useDraggable, DndContext, closestCorners } from "@dnd-kit/core";
-import { LuGripVertical } from "react-icons/lu";
-import { HiPencil } from "react-icons/hi2";
-import { RiCloseLine } from "react-icons/ri";
-import { IoChevronDownOutline } from "react-icons/io5";
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, closestCorners } from "@dnd-kit/core";
 import { Product } from "./product";
 
 const ProductList = ({
@@ -11,7 +7,6 @@ const ProductList = ({
     addedProductsArr,
     removeProduct,
     handleNotShowDiscount,
-    setShowAddProducts,
     handleOpen,
     handleShowVariant,
     removeVariant

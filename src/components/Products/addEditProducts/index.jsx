@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react"
-import ProductsModal from "./productsModal"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import _ from "underscore"
+
 import { getProducts } from "../../../redux/actions/productActions"
+
 import { getProductsError, getProductsLoading, getSelectedProducts } from "../../../redux/slices/productSlice"
+
 import ProductList from "./productList"
+import ProductsModal from "./productsModal"
 import { HiPencil } from "react-icons/hi2";
 import { LuGripVertical } from "react-icons/lu";
 import { RiCloseLine } from "react-icons/ri";
 import { IoChevronDownOutline, IoChevronUpOutline } from "react-icons/io5";
-import _ from "underscore"
 
 
 export default function AddEditProducts() {
@@ -19,6 +22,8 @@ export default function AddEditProducts() {
     const productsLoading = useSelector(getProductsLoading)
     const productsError = useSelector(getProductsError)
 
+    const scrollableRef = useRef(null);
+
     const [search, setSearch] = useState('')
     const [showAddProducts, setShowAddProducts] = useState(false)
     const [addedProductsArr, setAddedProductsArr] = useState([{ showDiscount: true }])
@@ -26,18 +31,29 @@ export default function AddEditProducts() {
     const [indexToInsert, setIndexToInsert] = useState('')
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [selectedVariants, setSelectedVariants] = useState({});
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
-        if (search) {
-            dispatch(getProducts({ searchTerm: search, page: 1 }))
+        if (search && page) {
+            dispatch(getProducts({ searchTerm: search, page: page }))
         }
-    }, [search])
+    }, [search,page])
 
     useEffect(() => {
         if (!productsLoading && !productsError && search?.length > 0) {
             setProductsArr(products)
         }
     }, [productsLoading, productsError, search])
+
+    const handleScroll = () => {
+        const scrollable = scrollableRef.current;
+        if (scrollable) {
+            const { scrollTop, clientHeight, scrollHeight } = scrollable;
+            if (scrollTop + clientHeight === scrollHeight) {
+                dispatch(getProducts({ searchTerm: search, page: products.length / 10 + 1 }));
+            }
+        }
+    };
 
     const handleProductChange = (e, product) => {
         if (e.target.checked) {
@@ -135,6 +151,8 @@ export default function AddEditProducts() {
     }
     const handleSearchChange = (e) => {
         setSearch(e.target.value)
+        setPage(1);
+        setProductsArr([])
     }
 
     const handleOpen = (index) => {
@@ -158,6 +176,7 @@ export default function AddEditProducts() {
                     setShowAddProducts={setShowAddProducts}
                     handleOpen={handleOpen}
                     handleShowVariant={handleShowVariant}
+                    removeVariant={removeVariant}
                 />
             </div>
             <div className="flex--end">
@@ -168,6 +187,7 @@ export default function AddEditProducts() {
                 </button>
             </div>
             <ProductsModal
+                scrollableRef={scrollableRef}
                 showAddProducts={showAddProducts}
                 handleClose={handleClose}
                 handleSearchChange={handleSearchChange}
@@ -180,6 +200,7 @@ export default function AddEditProducts() {
                 handleVariantChange={handleVariantChange}
                 selectedProducts={selectedProducts}
                 selectedVariants={selectedVariants}
+                handleScroll={handleScroll}
             />
         </div>
     )
