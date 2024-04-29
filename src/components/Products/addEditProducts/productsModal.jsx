@@ -15,7 +15,8 @@ function ProductsModal({
     selectedVariants,
     scrollableRef,
     handleScroll,
-    productsLoading
+    productsLoading,
+    handleCancel
 }) {
     return (
         showAddProducts &&
@@ -53,7 +54,10 @@ function ProductsModal({
                                                 type="checkbox"
                                                 name={product?.id}
                                                 onChange={(e) => handleProductChange(e, product)}
-                                                checked={selectedProducts?.indexOf(product) !== -1}
+                                                checked={
+                                                    selectedProducts?.indexOf(product) !== -1 &&
+                                                    selectedVariants?.[product?.id]?.length > 0
+                                                }
                                             />
                                             <img src={product?.image?.src} className="product-image" />
                                             <div className="product-name">{product?.title}</div>
@@ -81,7 +85,10 @@ function ProductsModal({
                 <div className="modal-footer">
                     <p> {selectedProducts?.length} Product Selected</p>
                     <div className="modal-footer__button-wrapper">
-                        <button className="button button--outlined">Cancel</button>
+                        <button
+                            className="button button--outlined"
+                            onClick={handleCancel}
+                        >Cancel</button>
                         <button
                             className="button button--green"
                             onClick={handleAdd}

@@ -8,11 +8,6 @@ import { getProductsError, getProductsLoading, getSelectedProducts } from "../..
 
 import ProductList from "./productList"
 import ProductsModal from "./productsModal"
-import { HiPencil } from "react-icons/hi2";
-import { LuGripVertical } from "react-icons/lu";
-import { RiCloseLine } from "react-icons/ri";
-import { IoChevronDownOutline, IoChevronUpOutline } from "react-icons/io5";
-
 
 export default function AddEditProducts() {
 
@@ -160,6 +155,14 @@ export default function AddEditProducts() {
         setShowAddProducts(true)
     }
 
+    const handleCancel = () => {
+        setSearch('')
+        setPage('')
+        setSelectedProducts([])
+        setSelectedVariants({})
+        handleClose()
+    }
+
     return (
         <div className="products-container">
             <h4 className="title">Add Products</h4>
@@ -201,6 +204,7 @@ export default function AddEditProducts() {
                 selectedProducts={selectedProducts}
                 selectedVariants={selectedVariants}
                 handleScroll={handleScroll}
+                handleCancel={handleCancel}
             />
         </div>
     )
