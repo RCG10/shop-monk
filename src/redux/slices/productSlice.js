@@ -16,7 +16,7 @@ const productsSlice = createSlice({
         builder
             .addCase(getProducts.pending, (state) => {
                 state.isLoading = true;
-                state.error = false;
+                state.error = null;
             })
             .addCase(getProducts.fulfilled, (state, action) => {
                 state.isLoading = false;
@@ -25,7 +25,7 @@ const productsSlice = createSlice({
             })
             .addCase(getProducts.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = true;
+                state.error = action.payload;
                 state.errorMsg = action.error.message;
             });
     },

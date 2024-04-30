@@ -8,6 +8,7 @@ import { getProductsError, getProductsLoading, getSelectedProducts } from "../..
 
 import ProductList from "./productList"
 import ProductsModal from "./productsModal"
+import NewProductList from "./newProductList"
 
 export default function AddEditProducts() {
 
@@ -17,22 +18,23 @@ export default function AddEditProducts() {
     const productsLoading = useSelector(getProductsLoading)
     const productsError = useSelector(getProductsError)
 
-    const scrollableRef = useRef(null);
+    const scrollableRef = useRef(null)
 
     const [search, setSearch] = useState('')
     const [showAddProducts, setShowAddProducts] = useState(false)
     const [addedProductsArr, setAddedProductsArr] = useState([{ showDiscount: true }])
     const [productsArr, setProductsArr] = useState([])
     const [indexToInsert, setIndexToInsert] = useState('')
-    const [selectedProducts, setSelectedProducts] = useState([]);
-    const [selectedVariants, setSelectedVariants] = useState({});
-    const [page, setPage] = useState(1);
+    const [selectedProducts, setSelectedProducts] = useState([])
+    const [selectedVariants, setSelectedVariants] = useState({})
+    const [updatedVariants, setUpdatedVariants] = useState({})
+    const [page, setPage] = useState(1)
 
     useEffect(() => {
         if (search && page) {
             dispatch(getProducts({ searchTerm: search, page: page }))
         }
-    }, [search,page])
+    }, [search, page])
 
     useEffect(() => {
         if (!productsLoading && !productsError && search?.length > 0) {
@@ -41,14 +43,14 @@ export default function AddEditProducts() {
     }, [productsLoading, productsError, search])
 
     const handleScroll = () => {
-        const scrollable = scrollableRef.current;
+        const scrollable = scrollableRef.current
         if (scrollable) {
-            const { scrollTop, clientHeight, scrollHeight } = scrollable;
+            const { scrollTop, clientHeight, scrollHeight } = scrollable
             if (scrollTop + clientHeight === scrollHeight) {
-                dispatch(getProducts({ searchTerm: search, page: products.length / 10 + 1 }));
+                dispatch(getProducts({ searchTerm: search, page: products.length / 10 + 1 }))
             }
         }
-    };
+    }
 
     const handleProductChange = (e, product) => {
         if (e.target.checked) {
@@ -66,12 +68,12 @@ export default function AddEditProducts() {
                 setSelectedVariants(updateObj)
             }
         }
-    };
+    }
 
     const handleVariantChange = (e, variant, product) => {
         if (e.target.checked) {
             if (selectedProducts.findIndex(p => p.id === product.id) === -1) {
-                setSelectedProducts(prevProducts => [...prevProducts, product]);
+                setSelectedProducts(prevProducts => [...prevProducts, product])
             }
             setSelectedVariants(prevVariants => ({
                 ...prevVariants,
@@ -79,17 +81,17 @@ export default function AddEditProducts() {
                     ...(prevVariants[product.id] || []),
                     variant
                 ]
-            }));
+            }))
         } else {
             setSelectedVariants(prevVariants => ({
                 ...prevVariants,
                 [product.id]: prevVariants[product.id]?.filter(v => v.id !== variant.id)
-            }));
+            }))
         }
-    };
+    }
 
     const handleAdd = () => {
-        const newArr = [...addedProductsArr];
+        const newArr = [...addedProductsArr]
         newArr.splice(indexToInsert, 1, selectedProducts?.map(product => {
             return {
                 ...product,
@@ -97,10 +99,10 @@ export default function AddEditProducts() {
                 showVariant: false,
                 'variants': selectedVariants[product?.id] || []
             }
-        }));
+        }))
         setAddedProductsArr(newArr?.flatMap(e => e))
         handleClose()
-    };
+    }
 
     const handleClose = () => {
         setShowAddProducts(false)
@@ -123,30 +125,30 @@ export default function AddEditProducts() {
     const removeVariant = (productId, variantId) => {
         const updatedProducts = addedProductsArr.map(product => {
             if (product.id === productId) {
-                product.variants = product.variants.filter(variant => variant.id !== variantId);
+                product.variants = product.variants.filter(variant => variant.id !== variantId)
             }
-            return product;
-        });
-        setAddedProductsArr(updatedProducts);
-    };
+            return product
+        })
+        setAddedProductsArr(updatedProducts)
+    }
 
     const handleNotShowDiscount = (ind) => {
         setAddedProductsArr((prevProducts) =>
             prevProducts.map((prevProduct, i) =>
                 i === ind ? { ...prevProduct, showDiscount: false } : prevProduct
             )
-        );
+        )
     }
     const handleShowVariant = (ind) => {
         setAddedProductsArr((prevProducts) =>
             prevProducts.map((prevProduct, i) =>
                 i === ind ? { ...prevProduct, showVariant: !prevProduct?.showVariant } : prevProduct
             )
-        );
+        )
     }
     const handleSearchChange = (e) => {
         setSearch(e.target.value)
-        setPage(1);
+        setPage(1)
         setProductsArr([])
     }
 
@@ -166,12 +168,12 @@ export default function AddEditProducts() {
     return (
         <div className="products-container">
             <h4 className="title">Add Products</h4>
-            <div className="list-container">
+            <div className="list-container" id="list-container">
                 <div className="list-headers">
                     <h5 className="sub-title">Product</h5>
                     <h5 className="sub-title">Discount</h5>
                 </div>
-                <ProductList
+                {/* <ProductList
                     setAddedProductsArr={setAddedProductsArr}
                     addedProductsArr={addedProductsArr}
                     removeProduct={removeProduct}
@@ -180,6 +182,17 @@ export default function AddEditProducts() {
                     handleOpen={handleOpen}
                     handleShowVariant={handleShowVariant}
                     removeVariant={removeVariant}
+                /> */}
+                <NewProductList
+                    addedProductsArr={addedProductsArr}
+                    setAddedProductsArr={setAddedProductsArr}
+                    handleOpen={handleOpen}
+                    handleNotShowDiscount={handleNotShowDiscount}
+                    removeProduct={removeProduct}
+                    handleShowVariant={handleShowVariant}
+                    removeVariant={removeVariant}
+                    updatedVariants={updatedVariants}
+                    setUpdatedVariants={setUpdatedVariants}
                 />
             </div>
             <div className="flex--end">

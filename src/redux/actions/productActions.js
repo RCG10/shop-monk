@@ -10,7 +10,6 @@ export const getProducts = createAsyncThunk('products/getProducts',
                     "Content-Type": "application/json",
                 },
             });
-
             const response = await res.json();
             return response
         } catch (err) {
