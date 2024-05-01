@@ -51,7 +51,7 @@ export default function AddEditProducts() {
             const handleScroll = () => {
                 if (
                     modalListScrollable.clientHeight + modalListScrollable.scrollTop + 5 >=
-                    modalListScrollable.scrollHeight
+                    modalListScrollable.scrollHeight && products?.length === 10
                 ) {
                     setPage((prev) => prev + 1);
                 }
