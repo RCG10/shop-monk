@@ -17,7 +17,6 @@ const ProductList = ({
     updatedVariants,
     setUpdatedVariants
 }) => {
-
     const handleDragDrop = (results) => {
         const { source, destination, type } = results;
         if (!destination) return;
@@ -31,7 +30,7 @@ const ProductList = ({
             reOrderedProducts?.splice(destinationIndex, 0, removedProduct)
             return setAddedProductsArr(reOrderedProducts)
         } else {
-            const requiredObj = {...updatedVariants}
+            const requiredObj = { ...updatedVariants }
             let productId = results?.type
             const reOrderedProducts = [...updatedVariants[productId]];
             const sourceIndex = source.index;
@@ -41,11 +40,13 @@ const ProductList = ({
             requiredObj[productId] = reOrderedProducts
             setUpdatedVariants(requiredObj)
             let resultProducts = addedProductsArr?.map(product => {
-                return {
-                    ...product,
-                    showDiscount: true,
-                    showVariant: true,
-                    'variants': requiredObj[product.id]
+                if (product?.id === productId) {
+                    return {
+                        ...product,
+                        'variants': requiredObj[product.id]
+                    }
+                } else {
+                    return product
                 }
             })
             return setAddedProductsArr(resultProducts)
@@ -100,7 +101,7 @@ const ProductList = ({
                                                     </select>
                                                     {addedProductsArr?.length > 1 &&
                                                         <RiCloseLine
-                                                            onClick={() => removeProduct(index)}
+                                                            onClick={() => removeProduct(index,product.id)}
                                                             style={{ cursor: 'pointer' }}
                                                         />
                                                     }

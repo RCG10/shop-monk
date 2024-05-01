@@ -108,6 +108,7 @@ export default function AddEditProducts() {
         setShowAddProducts(false)
         setProductsArr([])
         setSelectedProducts([])
+        setUpdatedVariants({ ...updatedVariants, ...selectedVariants })
         setSelectedVariants({})
         setSearch('')
     }
@@ -116,16 +117,25 @@ export default function AddEditProducts() {
         result.push({ showDiscount: true })
         setAddedProductsArr(result)
     }
-    const removeProduct = (ind) => {
+    const removeProduct = (ind, productId) => {
         const result = [...addedProductsArr]
         result.splice(ind, 1)
         setAddedProductsArr(result)
+        const updateObj = { ...updatedVariants }
+        if (updateObj?.hasOwnProperty(productId)) {
+            delete updateObj[productId]
+            setUpdatedVariants(updateObj)
+        }
     }
 
     const removeVariant = (productId, variantId) => {
         const updatedProducts = addedProductsArr.map(product => {
             if (product.id === productId) {
                 product.variants = product.variants.filter(variant => variant.id !== variantId)
+                setUpdatedVariants(prevVariants => ({
+                    ...prevVariants,
+                    [product.id]: prevVariants[product.id]?.filter(v => v.id !== variantId)
+                }))
             }
             return product
         })
@@ -155,6 +165,7 @@ export default function AddEditProducts() {
     const handleOpen = (index) => {
         setIndexToInsert(index)
         setShowAddProducts(true)
+        dispatch(getProducts({ searchTerm: search, page: page }))
     }
 
     const handleCancel = () => {
