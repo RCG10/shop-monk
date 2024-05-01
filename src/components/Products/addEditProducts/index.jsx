@@ -6,7 +6,6 @@ import { getProducts } from "../../../redux/actions/productActions"
 
 import { getProductsError, getProductsLoading, getSelectedProducts } from "../../../redux/slices/productSlice"
 
-import ProductList from "./productList"
 import ProductsModal from "./productsModal"
 import NewProductList from "./newProductList"
 
@@ -18,12 +17,10 @@ export default function AddEditProducts() {
     const productsLoading = useSelector(getProductsLoading)
     const productsError = useSelector(getProductsError)
 
-    const scrollableRef = useRef(null)
-
     const [search, setSearch] = useState('')
     const [showAddProducts, setShowAddProducts] = useState(false)
     const [addedProductsArr, setAddedProductsArr] = useState([{ showDiscount: true }])
-    const [productsArr, setProductsArr] = useState([])
+    const [productsArr, setProductsArr] = useState(products)
     const [indexToInsert, setIndexToInsert] = useState('')
     const [selectedProducts, setSelectedProducts] = useState([])
     const [selectedVariants, setSelectedVariants] = useState({})
@@ -37,20 +34,32 @@ export default function AddEditProducts() {
     }, [search, page])
 
     useEffect(() => {
-        if (!productsLoading && !productsError && search?.length > 0) {
-            setProductsArr(products)
-        }
-    }, [productsLoading, productsError, search])
+            dispatch(getProducts({ searchTerm: search, page: page }))
+    }, [])
 
-    const handleScroll = () => {
-        const scrollable = scrollableRef.current
-        if (scrollable) {
-            const { scrollTop, clientHeight, scrollHeight } = scrollable
-            if (scrollTop + clientHeight === scrollHeight) {
-                dispatch(getProducts({ searchTerm: search, page: products.length / 10 + 1 }))
-            }
+    useEffect(() => {
+        if (!productsLoading && !productsError) {
+            setProductsArr((prev) => {
+                return [...prev, ...products];
+            })
         }
-    }
+    }, [productsLoading, productsError])
+
+    useEffect(() => {
+        if (showAddProducts) {
+            const modalListScrollable = document.querySelector('.modal-list.scrollable');
+            const handleScroll = () => {
+                if (
+                    modalListScrollable.clientHeight + modalListScrollable.scrollTop + 5 >=
+                    modalListScrollable.scrollHeight
+                ) {
+                    setPage((prev) => prev + 1);
+                }
+            };
+            modalListScrollable.addEventListener('scroll', handleScroll);
+            return () => modalListScrollable.removeEventListener('scroll', handleScroll);
+        }
+    }, [productsLoading, search]);
 
     const handleProductChange = (e, product) => {
         if (e.target.checked) {
@@ -106,7 +115,6 @@ export default function AddEditProducts() {
 
     const handleClose = () => {
         setShowAddProducts(false)
-        setProductsArr([])
         setSelectedProducts([])
         setUpdatedVariants({ ...updatedVariants, ...selectedVariants })
         setSelectedVariants({})
@@ -165,12 +173,10 @@ export default function AddEditProducts() {
     const handleOpen = (index) => {
         setIndexToInsert(index)
         setShowAddProducts(true)
-        dispatch(getProducts({ searchTerm: search, page: page }))
     }
 
     const handleCancel = () => {
         setSearch('')
-        setPage('')
         setSelectedProducts([])
         setSelectedVariants({})
         handleClose()
@@ -184,16 +190,6 @@ export default function AddEditProducts() {
                     <h5 className="sub-title">Product</h5>
                     <h5 className="sub-title">Discount</h5>
                 </div>
-                {/* <ProductList
-                    setAddedProductsArr={setAddedProductsArr}
-                    addedProductsArr={addedProductsArr}
-                    removeProduct={removeProduct}
-                    handleNotShowDiscount={handleNotShowDiscount}
-                    setShowAddProducts={setShowAddProducts}
-                    handleOpen={handleOpen}
-                    handleShowVariant={handleShowVariant}
-                    removeVariant={removeVariant}
-                /> */}
                 <NewProductList
                     addedProductsArr={addedProductsArr}
                     setAddedProductsArr={setAddedProductsArr}
@@ -214,7 +210,7 @@ export default function AddEditProducts() {
                 </button>
             </div>
             <ProductsModal
-                scrollableRef={scrollableRef}
+                products={products}
                 showAddProducts={showAddProducts}
                 handleClose={handleClose}
                 handleSearchChange={handleSearchChange}
@@ -227,7 +223,6 @@ export default function AddEditProducts() {
                 handleVariantChange={handleVariantChange}
                 selectedProducts={selectedProducts}
                 selectedVariants={selectedVariants}
-                handleScroll={handleScroll}
                 handleCancel={handleCancel}
             />
         </div>
