@@ -13,7 +13,8 @@ function ProductsModal({
     selectedVariants,
     handleCancel,
     productsLoading,
-    productsArr
+    productsArr,
+    page
 }) {
     return (
         showAddProducts &&
@@ -39,44 +40,45 @@ function ProductsModal({
                     />
                 </div>
                 <div className="modal-list scrollable">
-                    {productsArr?.map((product) => {
-                        return (
-                            <div className="product-select-container" key={product.id}>
-                                <div className="product-select-wrapper">
-                                    <input
-                                        type="checkbox"
-                                        name={product?.id}
-                                        onChange={(e) => handleProductChange(e, product)}
-                                        checked={
-                                            selectedProducts?.indexOf(product) !== -1 &&
-                                            selectedVariants?.[product?.id]?.length > 0
-                                        }
-                                    />
-                                    <img src={product?.image?.src} alt="" className="product-image" />
-                                    <div className="product-name">{product?.title}</div>
-                                </div>
-                                {product?.variants?.map((variant) => {
-                                    return (
-                                        <div className="variant-select-wrapper" key={variant.id}>
-                                            <div className="variant-name">
-                                                <input
-                                                    type="checkbox"
-                                                    name={variant?.id}
-                                                    checked={selectedVariants?.[product?.id]?.some(item => item.id === variant?.id)}
-                                                    onChange={(e) => handleVariantChange(e, variant, product)}
-                                                />
-                                                <span>{variant?.title}</span>
+                    {page === 1 && productsLoading ? <LoadingSpinner /> :
+                        productsArr?.map((product, index) => {
+                            return (
+                                <div className="product-select-container" key={index}>
+                                    <div className="product-select-wrapper">
+                                        <input
+                                            type="checkbox"
+                                            name={product?.id}
+                                            onChange={(e) => handleProductChange(e, product)}
+                                            checked={
+                                                selectedProducts?.indexOf(product) !== -1 &&
+                                                selectedVariants?.[product?.id]?.length > 0
+                                            }
+                                        />
+                                        <img src={product?.image?.src} alt="" className="product-image" />
+                                        <div className="product-name">{product?.title}</div>
+                                    </div>
+                                    {product?.variants?.map((variant) => {
+                                        return (
+                                            <div className="variant-select-wrapper" key={variant.id}>
+                                                <div className="variant-name">
+                                                    <input
+                                                        type="checkbox"
+                                                        name={variant?.id}
+                                                        checked={selectedVariants?.[product?.id]?.some(item => item.id === variant?.id)}
+                                                        onChange={(e) => handleVariantChange(e, variant, product)}
+                                                    />
+                                                    <span>{variant?.title}</span>
+                                                </div>
+                                                <div className="variant-price">{variant?.price}</div>
                                             </div>
-                                            <div className="variant-price">{variant?.price}</div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        )
-                    })}
-                    <div style={{ margin: '30px auto' }}>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })}
+                    {page !== 1 && <div style={{ margin: '30px auto' }}>
                         {productsLoading && <LoadingSpinner />}
-                    </div>
+                    </div>}
                 </div>
                 <div className="modal-footer">
                     <p> {selectedProducts?.length} Product Selected</p>

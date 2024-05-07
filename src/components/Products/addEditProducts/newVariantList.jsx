@@ -33,12 +33,12 @@ const NewVariantList = (
                                         <div className="custom-input-variant">
                                             {variant?.title ? variant?.title : 'Select Product'}
                                         </div>
-                                        <div className="input-wrapper has-border-radius">
-                                            <input type="text" name="discount" id="" className="input" />
+                                        <div className=" has-border-radius">
+                                            {/* <input type="text" name="discount" id="" className="input" />
                                             <select name="" className="select">
                                                 <option value="">% Off <IoChevronDownOutline /></option>
                                                 <option value="">flat <IoChevronDownOutline /></option>
-                                            </select>
+                                            </select> */}
                                             {product?.variants?.length > 1 &&
                                                 <RiCloseLine
                                                     onClick={() => removeVariant(product.id, variant.id)}
