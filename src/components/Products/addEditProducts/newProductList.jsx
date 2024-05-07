@@ -99,13 +99,13 @@ const ProductList = ({
                                                         <option value="">% Off <IoChevronDownOutline /></option>
                                                         <option value="">flat <IoChevronDownOutline /></option>
                                                     </select>
-                                                    {addedProductsArr?.length > 1 &&
-                                                        <RiCloseLine
-                                                            onClick={() => removeProduct(index, product.id)}
-                                                            style={{ cursor: 'pointer' }}
-                                                        />
-                                                    }
                                                 </div>
+                                            }
+                                            {addedProductsArr?.length > 1 &&
+                                                <RiCloseLine
+                                                    onClick={() => removeProduct(index, product.id)}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
                                             }
                                         </div>
                                         {product?.variants?.length > 1 &&

@@ -28,38 +28,39 @@ export default function AddEditProducts() {
     const [page, setPage] = useState(1)
 
     useEffect(() => {
-        if (search && page) {
+        if (search || page) {
             dispatch(getProducts({ searchTerm: search, page: page }))
         }
     }, [search, page])
 
     useEffect(() => {
-            dispatch(getProducts({ searchTerm: search, page: page }))
-    }, [])
-
-    useEffect(() => {
-        if (!productsLoading && !productsError) {
-            setProductsArr((prev) => {
-                return [...prev, ...products];
-            })
+        if (products && products.length > 0 && !productsError && !productsLoading) {
+            if (page === 1 && showAddProducts) {
+                setProductsArr(products)
+                const modalListScrollable = document.querySelector('.modal-list.scrollable');
+                modalListScrollable.scrollTop = 0;
+            } else if (page > 1) {
+                setProductsArr(prevProducts => [...prevProducts, ...products])
+            }
         }
-    }, [productsLoading, productsError])
+    }, [products, page, showAddProducts])
 
     useEffect(() => {
         if (showAddProducts) {
-            const modalListScrollable = document.querySelector('.modal-list.scrollable');
+            const modalListScrollable = document.querySelector('.modal-list.scrollable')
             const handleScroll = () => {
                 if (
-                    modalListScrollable.clientHeight + modalListScrollable.scrollTop + 5 >=
+                    modalListScrollable.clientHeight + modalListScrollable.scrollTop + 10 >=
                     modalListScrollable.scrollHeight && products?.length === 10
                 ) {
-                    setPage((prev) => prev + 1);
+                    setPage((prev) => prev + 1)
                 }
-            };
-            modalListScrollable.addEventListener('scroll', handleScroll);
-            return () => modalListScrollable.removeEventListener('scroll', handleScroll);
+            }
+            modalListScrollable.addEventListener('scroll', handleScroll)
+            return () => modalListScrollable.removeEventListener('scroll', handleScroll)
         }
-    }, [productsLoading, search]);
+    }, [showAddProducts, products?.length, page]);
+
 
     const handleProductChange = (e, product) => {
         if (e.target.checked) {
@@ -92,10 +93,16 @@ export default function AddEditProducts() {
                 ]
             }))
         } else {
-            setSelectedVariants(prevVariants => ({
-                ...prevVariants,
-                [product.id]: prevVariants[product.id]?.filter(v => v.id !== variant.id)
-            }))
+            setSelectedVariants(prevVariants => {
+                const updatedVariants = {
+                    ...prevVariants,
+                    [product.id]: (prevVariants[product.id] || []).filter(v => v.id !== variant.id)
+                }
+                if (updatedVariants[product.id].length === 0) {
+                    setSelectedProducts(prevProducts => prevProducts.filter(p => p.id !== product.id))
+                }
+                return updatedVariants
+            })
         }
     }
 
@@ -120,11 +127,13 @@ export default function AddEditProducts() {
         setSelectedVariants({})
         setSearch('')
     }
+
     const addNewProduct = () => {
         const result = [...addedProductsArr]
         result.push({ showDiscount: true })
         setAddedProductsArr(result)
     }
+
     const removeProduct = (ind, productId) => {
         const result = [...addedProductsArr]
         result.splice(ind, 1)
@@ -165,9 +174,8 @@ export default function AddEditProducts() {
         )
     }
     const handleSearchChange = (e) => {
-        setSearch(e.target.value)
         setPage(1)
-        setProductsArr([])
+        setSearch(e.target.value)
     }
 
     const handleOpen = (index) => {
@@ -224,6 +232,7 @@ export default function AddEditProducts() {
                 selectedProducts={selectedProducts}
                 selectedVariants={selectedVariants}
                 handleCancel={handleCancel}
+                page={page}
             />
         </div>
     )
