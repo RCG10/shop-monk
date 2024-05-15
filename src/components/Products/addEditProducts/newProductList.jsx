@@ -4,7 +4,6 @@ import { IoChevronDownOutline, IoChevronUpOutline } from "react-icons/io5"
 import { LuGripVertical } from "react-icons/lu"
 import { RiCloseLine } from "react-icons/ri"
 import NewVariantList from "./newVariantList"
-import { useState } from "react"
 
 const ProductList = ({
     addedProductsArr,
@@ -15,7 +14,9 @@ const ProductList = ({
     handleShowVariant,
     removeVariant,
     updatedVariants,
-    setUpdatedVariants
+    setUpdatedVariants,
+    productDiscount,
+    handleDiscountChange
 }) => {
     const handleDragDrop = (results) => {
         const { source, destination, type } = results
@@ -94,18 +95,30 @@ const ProductList = ({
                                                     </button>
                                                 </div> :
                                                 <div className="input-wrapper">
-                                                    <input type="text" name="discount" id="" className="input" />
-                                                    <select name="" className="select">
-                                                        <option value="">% Off <IoChevronDownOutline /></option>
-                                                        <option value="">flat <IoChevronDownOutline /></option>
+                                                    <input
+                                                        type="text"
+                                                        value={productDiscount?.[product.id]?.discountValue}
+                                                        name="discountValue"
+                                                        id=""
+                                                        onChange={(e)=>handleDiscountChange(e,product.id)}
+                                                        className="input" />
+                                                    <select
+                                                        name="discountType"
+                                                        className="select"
+                                                        value={productDiscount?.[product.id]?.discountType ? 
+                                                            productDiscount?.[product.id]?.discountType : 'percent'}
+                                                        onChange={(e)=>handleDiscountChange(e,product.id)}
+                                                    >
+                                                        <option value="percent">% Off <IoChevronDownOutline /></option>
+                                                        <option value="flat">flat Off<IoChevronDownOutline /></option>
                                                     </select>
-                                                    {addedProductsArr?.length > 1 &&
-                                                        <RiCloseLine
-                                                            onClick={() => removeProduct(index, product.id)}
-                                                            style={{ cursor: 'pointer' }}
-                                                        />
-                                                    }
                                                 </div>
+                                            }
+                                            {addedProductsArr?.length > 1 &&
+                                                <RiCloseLine
+                                                    onClick={() => removeProduct(index, product.id)}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
                                             }
                                         </div>
                                         {product?.variants?.length > 1 &&

@@ -26,40 +26,32 @@ export default function AddEditProducts() {
     const [selectedVariants, setSelectedVariants] = useState({})
     const [updatedVariants, setUpdatedVariants] = useState({})
     const [page, setPage] = useState(1)
+    const [productDiscount, setProductDiscount] = useState({})
 
     useEffect(() => {
-        if (search && page) {
+        if (showAddProducts && (search || page)) {
             dispatch(getProducts({ searchTerm: search, page: page }))
         }
-    }, [search, page])
+    }, [search, page, showAddProducts])
 
     useEffect(() => {
-            dispatch(getProducts({ searchTerm: search, page: page }))
-    }, [])
-
-    useEffect(() => {
-        if (!productsLoading && !productsError) {
-            setProductsArr((prev) => {
-                return [...prev, ...products];
-            })
+        if (products && products.length > 0 && !productsError && !productsLoading) {
+            if (page === 1 && showAddProducts) {
+                setProductsArr(products)
+            } else if (page > 1) {
+                setProductsArr(prevProducts => [...prevProducts, ...products])
+            }
         }
-    }, [productsLoading, productsError])
+    }, [products, productsError, productsLoading, page, showAddProducts])
 
-    useEffect(() => {
-        if (showAddProducts) {
-            const modalListScrollable = document.querySelector('.modal-list.scrollable');
-            const handleScroll = () => {
-                if (
-                    modalListScrollable.clientHeight + modalListScrollable.scrollTop + 5 >=
-                    modalListScrollable.scrollHeight && products?.length === 10
-                ) {
-                    setPage((prev) => prev + 1);
-                }
-            };
-            modalListScrollable.addEventListener('scroll', handleScroll);
-            return () => modalListScrollable.removeEventListener('scroll', handleScroll);
+    const handleScroll = (e) => {
+        if (
+            e.target.clientHeight + e.target.scrollTop + 10 >=
+            e.target.scrollHeight && products?.length === 10
+        ) {
+            setPage((prev) => prev + 1)
         }
-    }, [productsLoading, search]);
+    }
 
     const handleProductChange = (e, product) => {
         if (e.target.checked) {
@@ -92,10 +84,16 @@ export default function AddEditProducts() {
                 ]
             }))
         } else {
-            setSelectedVariants(prevVariants => ({
-                ...prevVariants,
-                [product.id]: prevVariants[product.id]?.filter(v => v.id !== variant.id)
-            }))
+            setSelectedVariants(prevVariants => {
+                const updatedVariants = {
+                    ...prevVariants,
+                    [product.id]: (prevVariants[product.id] || []).filter(v => v.id !== variant.id)
+                }
+                if (updatedVariants[product.id].length === 0) {
+                    setSelectedProducts(prevProducts => prevProducts.filter(p => p.id !== product.id))
+                }
+                return updatedVariants
+            })
         }
     }
 
@@ -119,12 +117,16 @@ export default function AddEditProducts() {
         setUpdatedVariants({ ...updatedVariants, ...selectedVariants })
         setSelectedVariants({})
         setSearch('')
+        setProductsArr([])
+        setPage(1)
     }
+
     const addNewProduct = () => {
         const result = [...addedProductsArr]
         result.push({ showDiscount: true })
         setAddedProductsArr(result)
     }
+
     const removeProduct = (ind, productId) => {
         const result = [...addedProductsArr]
         result.splice(ind, 1)
@@ -165,9 +167,8 @@ export default function AddEditProducts() {
         )
     }
     const handleSearchChange = (e) => {
-        setSearch(e.target.value)
         setPage(1)
-        setProductsArr([])
+        setSearch(e.target.value)
     }
 
     const handleOpen = (index) => {
@@ -180,6 +181,16 @@ export default function AddEditProducts() {
         setSelectedProducts([])
         setSelectedVariants({})
         handleClose()
+    }
+
+    const handleDiscountChange = (e, productId) => {
+        setProductDiscount(prevProductDiscount => ({
+            ...prevProductDiscount,
+            [productId]: {
+                ...prevProductDiscount[productId],
+                [e.target.name]: e.target.value
+            }
+        }))
     }
 
     return (
@@ -200,6 +211,8 @@ export default function AddEditProducts() {
                     removeVariant={removeVariant}
                     updatedVariants={updatedVariants}
                     setUpdatedVariants={setUpdatedVariants}
+                    handleDiscountChange={handleDiscountChange}
+                    productDiscount={productDiscount}
                 />
             </div>
             <div className="flex--end">
@@ -224,6 +237,8 @@ export default function AddEditProducts() {
                 selectedProducts={selectedProducts}
                 selectedVariants={selectedVariants}
                 handleCancel={handleCancel}
+                page={page}
+                handleScroll={handleScroll}
             />
         </div>
     )
