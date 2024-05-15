@@ -14,7 +14,8 @@ function ProductsModal({
     handleCancel,
     productsLoading,
     productsArr,
-    page
+    page,
+    handleScroll
 }) {
     return (
         showAddProducts &&
@@ -39,7 +40,7 @@ function ProductsModal({
                         onChange={handleSearchChange}
                     />
                 </div>
-                <div className="modal-list scrollable">
+                <div className="modal-list scrollable" onScroll={handleScroll}>
                     {page === 1 && productsLoading ? <LoadingSpinner /> :
                         productsArr?.map((product, index) => {
                             return (

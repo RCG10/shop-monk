@@ -26,41 +26,32 @@ export default function AddEditProducts() {
     const [selectedVariants, setSelectedVariants] = useState({})
     const [updatedVariants, setUpdatedVariants] = useState({})
     const [page, setPage] = useState(1)
+    const [productDiscount, setProductDiscount] = useState({})
 
     useEffect(() => {
-        if (search || page) {
+        if (showAddProducts && (search || page)) {
             dispatch(getProducts({ searchTerm: search, page: page }))
         }
-    }, [search, page])
+    }, [search, page, showAddProducts])
 
     useEffect(() => {
         if (products && products.length > 0 && !productsError && !productsLoading) {
             if (page === 1 && showAddProducts) {
                 setProductsArr(products)
-                const modalListScrollable = document.querySelector('.modal-list.scrollable');
-                modalListScrollable.scrollTop = 0;
             } else if (page > 1) {
                 setProductsArr(prevProducts => [...prevProducts, ...products])
             }
         }
-    }, [products, page, showAddProducts])
+    }, [products, productsError, productsLoading, page, showAddProducts])
 
-    useEffect(() => {
-        if (showAddProducts) {
-            const modalListScrollable = document.querySelector('.modal-list.scrollable')
-            const handleScroll = () => {
-                if (
-                    modalListScrollable.clientHeight + modalListScrollable.scrollTop + 10 >=
-                    modalListScrollable.scrollHeight && products?.length === 10
-                ) {
-                    setPage((prev) => prev + 1)
-                }
-            }
-            modalListScrollable.addEventListener('scroll', handleScroll)
-            return () => modalListScrollable.removeEventListener('scroll', handleScroll)
+    const handleScroll = (e) => {
+        if (
+            e.target.clientHeight + e.target.scrollTop + 10 >=
+            e.target.scrollHeight && products?.length === 10
+        ) {
+            setPage((prev) => prev + 1)
         }
-    }, [showAddProducts, products?.length, page]);
-
+    }
 
     const handleProductChange = (e, product) => {
         if (e.target.checked) {
@@ -126,6 +117,8 @@ export default function AddEditProducts() {
         setUpdatedVariants({ ...updatedVariants, ...selectedVariants })
         setSelectedVariants({})
         setSearch('')
+        setProductsArr([])
+        setPage(1)
     }
 
     const addNewProduct = () => {
@@ -190,6 +183,16 @@ export default function AddEditProducts() {
         handleClose()
     }
 
+    const handleDiscountChange = (e, productId) => {
+        setProductDiscount(prevProductDiscount => ({
+            ...prevProductDiscount,
+            [productId]: {
+                ...prevProductDiscount[productId],
+                [e.target.name]: e.target.value
+            }
+        }))
+    }
+
     return (
         <div className="products-container">
             <h4 className="title">Add Products</h4>
@@ -208,6 +211,8 @@ export default function AddEditProducts() {
                     removeVariant={removeVariant}
                     updatedVariants={updatedVariants}
                     setUpdatedVariants={setUpdatedVariants}
+                    handleDiscountChange={handleDiscountChange}
+                    productDiscount={productDiscount}
                 />
             </div>
             <div className="flex--end">
@@ -233,6 +238,7 @@ export default function AddEditProducts() {
                 selectedVariants={selectedVariants}
                 handleCancel={handleCancel}
                 page={page}
+                handleScroll={handleScroll}
             />
         </div>
     )
